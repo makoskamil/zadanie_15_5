@@ -57,7 +57,10 @@ App = React.createClass({
                             url: data.fixed_width_downsampled_url,
                             sourceUrl: data.url
                         };
-                        reject(gif);
+                        resolve(gif);
+                    }
+                    else {
+                        reject (new Error('Gif not found'));
                     }
                 };
                 xhr.send();
