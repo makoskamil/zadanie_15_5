@@ -21,4 +21,3 @@ Gif = React.createClass({
         );
     }
 });
-
