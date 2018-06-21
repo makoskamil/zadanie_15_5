@@ -13,14 +13,19 @@ App = React.createClass({
     handleSearch: function(searchingText) {
         this.setState({
             loading: true
-        });
-        this.getGif(searchingText, function(gif) {
-            this.setState({
-                loading: false,
-                gif: gif,
-                searchingText: searchingText
+        }); 
+
+        this.getGif(searchingText)
+            .then(function(gif) {
+                this.setState({
+                    loading: false,
+                    gif: gif,
+                    searchingText: searchingText
+                });
+            }.bind(this))
+            .catch(function(err) {
+
             });
-            }.bind(this));
       },
 /*    
     getGif: function(searchingText, callback) {
@@ -40,31 +45,28 @@ App = React.createClass({
         xhr.send();
     },
     */
-        getGif: function(searchingText){
-            
-            return new Promise(
-            function(resolve, reject){  //
+    getGif: function(searchingText){            
+        return new Promise(function(resolve, reject){  //                
+            var url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;
+            var xhr = new XMLHttpRequest();
+        
+            xhr.open('GET', url);
+            xhr.onload = function() {
                 
-                var url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;
-                var xhr = new XMLHttpRequest();
-            
-                xhr.open('GET', url);
-                xhr.onload = function() {
-                    
-                    if (xhr.status === 200) {
-                        var data = JSON.parse(xhr.responseText).data;
-                        var gif = {
-                            url: data.fixed_width_downsampled_url,
-                            sourceUrl: data.url
-                        };
-                        resolve(gif);
-                    }
-                    else {
-                        reject (new Error('Gif not found'));
-                    }
-                };
-                xhr.send();
-            });
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText).data;
+                    var gif = {
+                        url: data.fixed_width_downsampled_url,
+                        sourceUrl: data.url
+                    };
+                    resolve(gif);
+                }
+                else {
+                    reject(new Error('Gif not found'));
+                }
+            };
+            xhr.send();
+        });
     },
     
     render: function() {
